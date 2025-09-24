@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>飞阳校园零食盒子-可跳转版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "微软雅黑", sans-serif; }
+        body { background-color: #fff; padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .title { font-size: 24px; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .btn, .link { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            background-color: #333; 
+            color: #fff; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin: 10px; 
+            text-decoration: none;
+        }
+        .product-card { border: 1px solid #ddd; padding: 10px; margin-bottom: 20px; }
+        .cart-controls { display: flex; align-items: center; margin: 10px 0; }
+        .cart-btn { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background-color: #333; color: #fff; border: none; cursor: pointer; }
+        .cart-count { width: 40px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; }
+        .cart-area { margin-top: 30px; padding: 20px; border: 1px solid #ddd; }
+        .checkout-list { margin: 20px 0; }
+        .checkout-item { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 10px; border-bottom: 1px dashed #ddd; }
+        .total-area { text-align: right; margin-top: 20px; font-size: 18px; }
+        .payment-area { margin-top: 30px; }
+        .payment-option { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; cursor: pointer; }
+        .payment-option.active { border-color: #f60; background-color: #fff8f5; }
+        .qr-code { max-width: 250px; margin: 0 auto; border: 1px solid #ddd; padding: 10px; margin-top: 20px; }
+        .action-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <!-- 1. 入口页（含二维码+跳转链接） -->
+    <div class="page active" id="entry-page">
+        <h1 class="title">飞阳校园零食盒子-入口</h1>
+        <a href="#list-page" class="link">点击 → 商品列表页</a>
+        <a href="#checkout-page" class="link">点击 → 付款页</a>
+
+        <div class="qr-code" id="qrCode"></div>
+        <p>扫描上方二维码也可进入商品列表页</p>
+    </div>
+
+    <!-- 2. 商品列表页 -->
+    <div class="page" id="list-page">
+        <h1 class="title">飞阳校园零食盒子-商品列表</h1>
+        <div class="action-buttons">
+            <a href="#entry-page" class="link">返回入口页</a>
+            <a href="#checkout-page" class="link">去付款页</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/150" alt="商品图片" style="width: 100%; height: 150px; object-fit: cover; margin-bottom: 10px;">
+            <h4>商品名称：阳文胜</h4>
+            <p>原价：¥666666.5</p>
+            <p>售价：¥333333</p>
+            <p>库存：1111111</p>
+            <div class="cart-controls">
+                <button class="cart-btn" id="decreaseBtn">-</button>
+                <span class="cart-count" id="cartCount">0</span>
+                <button class="cart-btn" id="increaseBtn">+</button>
+            </div>
+            <button class="btn" onclick="alert('删除操作')">删除</button>
+        </div>
+
+        <div class="cart-area">
+            <h3>已选商品：<span id="selectedCount">0</span>件 | 总价：<span id="totalPrice">¥0.00</span></h3>
+            <p>满减规则：满20元立减4元，满10元立减1元（仅可使用一次）</p>
+        </div>
+    </div>
+
+    <!-- 3. 付款页 -->
+    <div class="page" id="checkout-page">
+        <h1 class="title">飞阳校园零食盒子-结算</h1>
+        <div class="action-buttons">
+            <a href="#list-page" class="link">返回商品列表</a>
+            <a href="#entry-page" class="link">返回入口页</a>
+        </div>
+
+        <div class="checkout-list">
+            <div class="checkout-item" id="checkoutItem">
+                <div>
+                    <h4>阳文胜 × <span id="checkoutCount">0</span></h4>
+                    <p>单价：¥333333</p>
+                </div>
+                <div id="checkoutItemPrice">¥0.00</div>
+            </div>
+        </div>
+
+        <div class="total-area">
+            <p>总计：<span id="checkoutTotal">¥0.00</span></p>
+            <p>满减优惠：<span id="discount">¥0.00</span></p>
+            <p>实付：<span id="payable">¥0.00</span></p>
+        </div>
+
+        <div class="payment-area">
+            <h3>选择支付方式</h3>
+            <div class="payment-option active" onclick="alert('选择微信支付')">
+                <h4>微信支付</h4>
+                <p>支持微信扫码支付,安全便捷</p>
+            </div>
+            <div class="payment-option" onclick="alert('支付宝暂未开通')">
+                <h4>支付宝支付</h4>
+                <p>暂未开通,敬请期待</p>
+            </div>
+            <button class="btn" onclick="alert('支付成功')">立即支付</button>
+        </div>
+    </div>
+
+    <script>
+        // 页面切换逻辑
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            if (pageId === 'checkout-page') updateCheckout();
+        }
+
+        // 生成二维码（绑定商品列表页链接）
+        new QRCode(document.getElementById('qrCode'), {
+            text: window.location.href.split('#')[0] + '#list-page',
+            width: 200, height: 200, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // 购物车逻辑
+        let cartQuantity = 0;
+        const pricePerItem = 333333;
+        document.getElementById('increaseBtn').addEventListener('click', () => {
+            if (cartQuantity < 1111111) { cartQuantity++; updateCart(); }
+            else alert('库存不足！');
+        });
+        document.getElementById('decreaseBtn').addEventListener('click', () => {
+            if (cartQuantity > 0) { cartQuantity--; updateCart(); }
+        });
+        function updateCart() {
+            document.getElementById('cartCount').textContent = cartQuantity;
+            document.getElementById('selectedCount').textContent = cartQuantity;
+            const total = cartQuantity * pricePerItem;
+            document.getElementById('totalPrice').textContent = `¥${total.toFixed(2)}`;
+        }
+
+        // 结算逻辑
+        function updateCheckout() {
+            document.getElementById('checkoutCount').textContent = cartQuantity;
+            const itemTotal = cartQuantity * pricePerItem;
+            document.getElementById('checkoutItemPrice').textContent = `¥${itemTotal.toFixed(2)}`;
+            document.getElementById('checkoutTotal').textContent = `¥${itemTotal.toFixed(2)}`;
+            const dis = itemTotal >= 20 ? 4 : (itemTotal >= 10 ? 1 : 0);
+            document.getElementById('discount').textContent = `¥${dis.toFixed(2)}`;
+            document.getElementById('payable').textContent = `¥${(itemTotal - dis).toFixed(2)}`;
+        }
+
+        // 页面加载时自动跳转（根据URL锚点）
+        window.addEventListener('load', () => {
+            const hash = window.location.hash;
+            if (hash === '#list-page') switchPage('list-page');
+            else if (hash === '#checkout-page') switchPage('checkout-page');
+        });
+    </script>
+</body>
+</html>
